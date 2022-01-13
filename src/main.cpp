@@ -14,7 +14,8 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
-float rotation = 0;
+float rotation_prism = 0;
+float rotation_camera = 0;
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
@@ -149,9 +150,10 @@ int main(int argc, char* argv[])
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 0.1f, 100.0f);
-    glm::mat4 view = glm::mat4(1.0f);
+//    glm::mat4 view = glm::mat4(1.0f);
+
 // note that we're translating the scene in the reverse direction of where we want to move
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+//    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -169,9 +171,14 @@ int main(int argc, char* argv[])
         ourShader.use();
         glm::mat4 trans = glm::mat4(1.0f);
         double sins = sin(glfwGetTime());
-        trans = glm::translate(trans, glm::vec3(0.0f, sins / 1.5, 0.0f));
-        trans = glm::rotate(trans, (float)1, glm::vec3(1.0f, 0.0f, 0.0f));
+//        trans = glm::translate(trans, glm::vec3(0.0f, sins / 1.5, 0.0f));
+        trans = glm::rotate(trans, (float)rotation_prism, glm::vec3(0.0f, 0.0f, 1.0f));
         trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+        const float radius = 10.0f;
+        float camX = sin(rotation_camera) * radius;
+        float camZ = cos(rotation_camera) * radius;
+        glm::mat4 view;
+        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
         ourShader.setMat4("transform", trans);
         ourShader.setMat4("perspective", projection);
         ourShader.setMat4("view", view);
@@ -207,7 +214,9 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        rotation += 0.5;
+        rotation_prism += 0.05;
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+        rotation_camera += 0.05;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
