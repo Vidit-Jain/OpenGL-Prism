@@ -61,57 +61,79 @@ int main(int argc, char* argv[])
 
     // build and compile our shader program
     Shader ourShader("../src/vertex.shader", "../src/fragment.shader");
-
-    float vertices[12 * (x + 1)];
-    unsigned int indices[12 * x];
-    // Center point
-    vertices[0] = 0.0f;
-    vertices[1] = 0.0f;
-    vertices[2] = -0.5f;
-    // Random colors
-    for (int i = 0; i < 3; i++) {
-            vertices[i + 3] = (rand() % 255) / 255.0f;
-            vertices[6 * (x + 1) + 3 + i] = (rand() % 255) / 255.0f;
-    }
-
-    vertices[6 * (x + 1) + 0] = 0.0f;
-    vertices[6 * (x + 1) + 1] = 0.0f;
-    vertices[6 * (x + 1) + 2] = 0.5f;
     double theta = (double)360 / x;
     theta *= (double) M_PI / 180;
-    double curr = 0;
-    double r = 0.5f;
-    for (int i = 1; i <= x; i++) {
-        vertices[6 * i] = vertices[6 * (x + 1 + i)] = r * cos(curr);
-
-        vertices[6 * i + 1] = vertices[6 * (x + 1 + i) + 1] = r * sin(curr);
-        vertices[6 * i + 2] = -0.5f;
-        vertices[6 * (x + 1 + i) + 2] = 0.5f;
-        // Random colors
-        for (int j = 0; j < 3; j++) {
-            vertices[6 * i + 3 + j] = (rand() % 255) / 255.0f;
-            vertices[6 * (x + 1 + i) + 3 + j] = (rand() % 255) / 255.0f;
-        }
-        curr += theta;
-    }
     glEnable(GL_DEPTH_TEST);
+    double r = 0.5f;
+    float vertices[72 * x];
+    float randomColor[3];
+    float randomColor2[3];
+    for (int i = 0; i < 3; i++) {
+        randomColor[i] = (rand() % 255) / 255.0f;
+        randomColor2[i] = (rand() % 255) / 255.0f;
+    }
     for (int i = 0; i < x; i++) {
-        indices[3 * i] = 0;
-        indices[3 * (x + i)] = x + 1;
+        // Center vertex
+        vertices[18 * (x + i)] = vertices[18 * i] = 0.0f;
+        vertices[18 * (x + i) + 1] =  vertices[18 * i + 1] = 0.0f;
+        vertices[18 * i + 2] = 0.5f;
+        vertices[18 * (x + i) + 2] =  -0.5f;
 
-        indices[3 * i + 1] = (i - 1 + x) % x + 1;
-        indices[3 * (x + i) + 1] = indices[3 * i + 1] + x + 1;
+        // Second vertex
+        vertices[18 * (x + i) + 6] = vertices[18 * i + 6] = r * cos(i * theta);
+        vertices[18 * (x + i) + 6 + 1] = vertices[18 * i + 6 + 1] = r * sin(i * theta);
+        vertices[18 * i + 6 + 2] = 0.5f;
+        vertices[18 * (x + i) + 6 + 2] = -0.5f;
 
-        indices[3 * i + 2] = i + 1;
-        indices[3 * (x + i) + 2] = indices[3 * i + 2] + x + 1;
+        // Third vertex anticlockwise
+        vertices[18 * (x + i) + 12] =  vertices[18 * i + 12] = r * cos((i + 1) * theta);
+        vertices[18 * (x + i) + 12 + 1] = vertices[18 * i + 12 + 1] = r * sin((i + 1) * theta);
+        vertices[18 * i + 12 + 2] = 0.5f;
+        vertices[18 * (x + i) + 12 + 2] = -0.5f;
 
-        indices[6 * (x + i)] = i + 1;
-        indices[6 * (x + i) + 1] = x + i + 2;
-        indices[6 * (x + i) + 2] = (i + 1) % x + 1;
+        for (int j = 0; j < 3; j++) {
+            for (int k = 0; k < 3; k++) {
+                vertices[18 * i + j * 6 + k + 3] = randomColor[k];
+                vertices[18 * (x + i) + j * 6 + k + 3] = randomColor2[k];
+            }
+        }
+    }
 
-        indices[6 * (x + i) + 3] = i + 1;
-        indices[6 * (x + i) + 4] = x + i + 2;
-        indices[6 * (x + i) + 5] = (i - 1 + x) % x + x + 2;
+    for (int i = 0; i < x; i++) {
+        float color[3];
+        for (int j = 0; j < 3; j++) {
+            color[j] = (rand() % 255) / 255.0f;
+        }
+        // Top and bottom vertices
+        vertices[36 * (x + i) + 6] = vertices[36 * (x + i)] = r * cos(i * theta);
+        vertices[36 * (x + i) + 6 + 1] = vertices[36 * (x + i) + 1] = r * sin(i * theta);
+        vertices[36 * (x + i) + 2] = 0.5f;
+        vertices[36 * (x + i) + 6 + 2] = -0.5f;
+
+        vertices[36 * (x + i) + 12] = r * cos((i + 1)  * theta);
+        vertices[36 * (x + i) + 12 + 1] = r * sin((i + 1)  * theta);
+        vertices[36 * (x + i) + 12 + 2] = 0.5f;
+
+
+        vertices[36 * (x + i) + 6 + 18] = vertices[36 * (x + i) + 18] = r * cos((i + 1) * theta);
+        vertices[36 * (x + i) + 6 + 1 + 18] = vertices[36 * (x + i) + 1 + 18] = r * sin((i + 1) * theta);
+        vertices[36 * (x + i) + 2 + 18] = 0.5f;
+        vertices[36 * (x + i) + 6 + 2 + 18] = -0.5f;
+
+        vertices[36 * (x + i) + 12 + 18] = r * cos(i  * theta);
+        vertices[36 * (x + i) + 12 + 1 + 18] = r * sin(i  * theta);
+        vertices[36 * (x + i) + 12 + 2 + 18] = -0.5f;
+
+        for (int j = 0; j < 3; j++) {
+            for (int k = 0; k < 3; k++) {
+                vertices[36 * (x + i) + 6 * j + k + 3] = color[k];
+                vertices[36 * (x + i) + 6 * j + k + 3 + 18] = color[k];
+            }
+        }
+    }
+    unsigned int indices[12 * x];
+    for (int i = 0; i < 12 * x; i++) {
+        indices[i] = i;
     }
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -131,9 +153,6 @@ int main(int argc, char* argv[])
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-//    glEnableVertexAttribArray(1);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
