@@ -107,7 +107,9 @@ class Camera
         // update Front, Right and Up Vectors using the updated Euler angles
         updateCameraVectors();
     }
-
+    void setPosition(glm::vec3 position) {
+        Position = position;
+    }
     // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(float yoffset)
     {
