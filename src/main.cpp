@@ -5,7 +5,8 @@
 #include <GLFW/glfw3.h>
 #include <bits/stdc++.h>
 #include <iostream>
-#include "../include/shader.h"
+#include "shader.h"
+#include "camera.h"
 
 using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -16,6 +17,11 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 float rotation_prism = 0;
 float rotation_camera = 0;
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float delta = 0.0f, last = 0.0f;
+//float center[3] = {0.0f, 0.0f, 0.0f};
+glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
+//Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
@@ -168,7 +174,7 @@ int main(int argc, char* argv[])
 //     uncomment this call to draw in wireframe polygons.
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 800.0f, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
 //    glm::mat4 view = glm::mat4(1.0f);
 
 // note that we're translating the scene in the reverse direction of where we want to move
@@ -179,6 +185,9 @@ int main(int argc, char* argv[])
     {
         // input
         // -----
+        float current = glfwGetTime();
+        delta = current - last;
+        last = current;
         processInput(window);
 
         // render
@@ -191,13 +200,15 @@ int main(int argc, char* argv[])
         glm::mat4 trans = glm::mat4(1.0f);
         double sins = sin(glfwGetTime());
 //        trans = glm::translate(trans, glm::vec3(0.0f, sins / 1.5, 0.0f));
+        trans = glm::translate(trans, center);
         trans = glm::rotate(trans, (float)rotation_prism, glm::vec3(0.0f, 0.0f, 1.0f));
         trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
         const float radius = 10.0f;
         float camX = sin(rotation_camera) * radius;
         float camZ = cos(rotation_camera) * radius;
-        glm::mat4 view;
-        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+//        glm::mat4 view;
+//        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+        glm::mat4 view = camera.GetViewMatrix(center);
         ourShader.setMat4("transform", trans);
         ourShader.setMat4("perspective", projection);
         ourShader.setMat4("view", view);
@@ -236,6 +247,22 @@ void processInput(GLFWwindow *window)
         rotation_prism += 0.05;
     if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
         rotation_camera += 0.05;
+    // Moving camera around
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, delta);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(DOWN, delta);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, delta);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, delta);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, delta);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, delta);
+    // Moving object
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+        center += glm::vec3(0.0f, 0.0f, delta * 2.5f);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
