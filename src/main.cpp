@@ -215,6 +215,7 @@ int main(int argc, char* argv[])
         delta = current - last;
         last = current;
         processInput(window);
+        // Rotating the camera and prism is needed
         if (rotate_camera) camera.revolve(delta, center);
         if (rotate_prism) prism_angle += delta * prism_rotate_speed;
         // render
@@ -278,7 +279,7 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         camera.ProcessKeyboard(BACKWARD, delta, center);
 
-    // Moving object
+    // Moving object wrt camera axes
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         center += camera.cameraRelative(FORWARD, delta);
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
@@ -307,6 +308,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
+// For toggling keys
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_T && action == GLFW_PRESS)

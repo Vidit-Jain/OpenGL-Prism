@@ -74,7 +74,9 @@ class Camera
         return glm::lookAt(Position, look, Up);
     }
     void revolve(float deltaTime, glm::vec3 center) {
+        // Look at the center of the prism
         updateCenter(center);
+        // Rotate position vector by translating look vector to zero.
         glm::vec3 v = Position - look;
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::rotate(trans, rotateSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -84,6 +86,7 @@ class Camera
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime, glm::vec3 center)
     {
+        // Look at the center of the prism
         updateCenter(center);
         float velocity = MovementSpeed * deltaTime;
         if (direction == UP)
@@ -105,9 +108,9 @@ class Camera
     }
     glm::vec3 cameraRelative(Camera_Movement direction, float deltaTime)
     {
+        // Finding vectors relative to the camera
         glm::vec3 f = glm::normalize(look - Position);
-        // also re-calculate the Right and Up vector
-        glm::vec3 r = glm::normalize(glm::cross(f, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        glm::vec3 r = glm::normalize(glm::cross(f, WorldUp));
         glm::vec3 u = glm::normalize(glm::cross(r, f));
 
         float velocity = MovementSpeed * deltaTime;
@@ -123,6 +126,8 @@ class Camera
             return f * velocity;
         if (direction == BACKWARD)
             return -f * velocity;
+
+        return glm::vec3(0.0f, 0.0f, 0.0f);
     }
     private:
     // calculates the front vector from the Camera's (updated) Euler Angles
