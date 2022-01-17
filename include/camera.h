@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
+#include <bits/stdc++.h>
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
@@ -98,8 +99,9 @@ class Camera
     {
         glm::vec3 f = glm::normalize(look - Position);
         // also re-calculate the Right and Up vector
-        glm::vec3 r = glm::normalize(glm::cross(Front, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        glm::vec3 u = glm::normalize(glm::cross(Right, Front));
+        glm::vec3 r = glm::normalize(glm::cross(f, WorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        glm::vec3 u = glm::normalize(glm::cross(r, f));
+
         float velocity = MovementSpeed * deltaTime;
         if (direction == UP)
             return u * velocity;
