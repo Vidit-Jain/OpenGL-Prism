@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
         ourShader.use();
 
         glm::mat4 trans = glm::mat4(1.0f);
-        glm::mat4 view = camera.GetViewMatrix(center);
+        glm::mat4 view = camera.GetViewMatrix();
         // Transformations applied to the object
         trans = glm::translate(trans, center);
         trans = glm::rotate(trans, (float)rotation_prism, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -265,37 +265,37 @@ void processInput(GLFWwindow *window)
 
     // Moving camera around
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-        camera.ProcessKeyboard(UP, delta);
+        camera.ProcessKeyboard(UP, delta, center);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWN, delta);
+        camera.ProcessKeyboard(DOWN, delta, center);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, delta);
+        camera.ProcessKeyboard(LEFT, delta, center);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, delta);
+        camera.ProcessKeyboard(RIGHT, delta, center);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, delta);
+        camera.ProcessKeyboard(FORWARD, delta, center);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, delta);
+        camera.ProcessKeyboard(BACKWARD, delta, center);
 
     // Moving object
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-        center += glm::vec3(0.0f, 0.0f, delta * 2.5f);
+        center += camera.cameraRelative(FORWARD, delta);
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-        center += glm::vec3(0.0f, 0.0f, -delta * 2.5f);
+        center += camera.cameraRelative(BACKWARD, delta);
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        center += glm::vec3(delta * 2.5f, 0.0f, 0.0f);
+        center += camera.cameraRelative(LEFT, delta);
     if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-        center += glm::vec3(-delta * 2.5f, 0.0f, 0.0f);
+        center += camera.cameraRelative(RIGHT, delta);
     if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-        center += glm::vec3(0.0f, -delta * 2.5f, 0.0f);
+        center += camera.cameraRelative(UP, delta);
     if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
-        center += glm::vec3(0.0f, delta * 2.5f, 0.0f);
+        center += camera.cameraRelative(DOWN, delta);
 
     // Camera presets
     if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
-        camera.setPosition(preset1);
+        camera.setPosition(preset1, center);
     if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
-        camera.setPosition(preset2);
+        camera.setPosition(preset2, center);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
