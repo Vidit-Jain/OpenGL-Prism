@@ -42,6 +42,7 @@ class Camera
     float Pitch;
     // camera options
     float MovementSpeed;
+    float rotateSpeed = 2.5f;
     float MouseSensitivity;
     float Zoom;
 
@@ -72,7 +73,14 @@ class Camera
     {
         return glm::lookAt(Position, look, Up);
     }
-
+    void revolve(float deltaTime, glm::vec3 center) {
+        updateCenter(center);
+        glm::vec3 v = Position - look;
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, rotateSpeed * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec4 temp = trans * glm::vec4(v, 1.0f);
+        Position = glm::vec3(temp) + look;
+    }
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime, glm::vec3 center)
     {
@@ -92,7 +100,7 @@ class Camera
             Position -= Front * velocity;
     }
 
-    void setPosition(glm::vec3 position, glm::vec3 center) {
+    void setPosition(glm::vec3 position) {
         Position = position;
     }
     glm::vec3 cameraRelative(Camera_Movement direction, float deltaTime)

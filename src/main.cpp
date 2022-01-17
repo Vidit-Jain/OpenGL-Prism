@@ -10,14 +10,17 @@
 
 using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
-float rotation_prism = 0;
-float rotation_camera = 0;
+bool rotate_prism = false;
+float prism_angle = 0.0f;
+const float prism_rotate_speed = 2.5f;
+bool rotate_camera = false;
 
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -63,6 +66,7 @@ int main(int argc, char* argv[])
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -211,7 +215,8 @@ int main(int argc, char* argv[])
         delta = current - last;
         last = current;
         processInput(window);
-
+        if (rotate_camera) camera.revolve(delta, center);
+        if (rotate_prism) prism_angle += delta * prism_rotate_speed;
         // render
         // ------
         // Filling with some color
@@ -223,7 +228,7 @@ int main(int argc, char* argv[])
         glm::mat4 view = camera.GetViewMatrix();
         // Transformations applied to the object
         trans = glm::translate(trans, center);
-        trans = glm::rotate(trans, (float)rotation_prism, glm::vec3(0.0f, 1.0f, 0.0f));
+        trans = glm::rotate(trans, prism_angle, glm::vec3(0.0f, 0.0f, 1.0f));
         trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
 
         // Setting the uniform matrices the respective values
@@ -258,10 +263,6 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        rotation_prism += 0.05;
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-        rotation_camera += 0.05;
 
     // Moving camera around
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
@@ -293,9 +294,9 @@ void processInput(GLFWwindow *window)
 
     // Camera presets
     if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
-        camera.setPosition(preset1, center);
+        camera.setPosition(preset1);
     if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
-        camera.setPosition(preset2, center);
+        camera.setPosition(preset2);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -306,4 +307,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
-
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_T && action == GLFW_PRESS)
+        rotate_camera = !rotate_camera;
+    if (key == GLFW_KEY_R && action == GLFW_PRESS)
+        rotate_prism = !rotate_prism;
+}
