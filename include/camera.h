@@ -126,6 +126,8 @@ class Camera
             return f * velocity;
         if (direction == BACKWARD)
             return -f * velocity;
+
+        return glm::vec3(0.0f, 0.0f, 0.0f);
     }
     private:
     // calculates the front vector from the Camera's (updated) Euler Angles
