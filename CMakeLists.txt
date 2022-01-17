@@ -9,7 +9,7 @@ set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 file(GLOB SOURCES "${SRC_DIR}/*.cpp")
 
 # Executable definition and properties
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} include/camera.h)
 target_include_directories(${PROJECT_NAME} PRIVATE "${INC_DIR}")
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
 
