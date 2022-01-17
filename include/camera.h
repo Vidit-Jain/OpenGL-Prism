@@ -103,7 +103,8 @@ class Camera
             Position -= Front * velocity;
     }
 
-    void setPosition(glm::vec3 position) {
+    void setPosition(glm::vec3 position, glm::vec3 center) {
+        updateCenter(center);
         Position = position;
     }
     glm::vec3 cameraRelative(Camera_Movement direction, float deltaTime)

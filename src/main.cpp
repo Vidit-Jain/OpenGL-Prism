@@ -295,9 +295,9 @@ void processInput(GLFWwindow *window)
 
     // Camera presets
     if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
-        camera.setPosition(preset1);
+        camera.setPosition(preset1, center);
     if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS)
-        camera.setPosition(preset2);
+        camera.setPosition(preset2, center);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
